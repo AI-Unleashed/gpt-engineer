@@ -1,0 +1,6 @@
+A python application that takes takes input from the user with dates and point form rough notes in JSON format, and returns a professional resume with the following sections:
+Contact information
+Resume introduction
+Professional experience
+Skills
+Education

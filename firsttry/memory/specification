@@ -1,0 +1,38 @@
+Specification for the Snake Game in Python using MVC architecture and keyboard control:
+
+1. Program Description:
+The program is a classic Snake game implementation in Python using the Model-View-Controller (MVC) architecture. The game will have a snake that moves around a grid, eating food to grow in size. The game ends when the snake collides with itself or the grid boundaries. The player will control the snake using the arrow keys on the keyboard.
+
+2. Features:
+- Snake movement using arrow keys (up, down, left, right)
+- Randomly generated food on the grid
+- Snake grows in size when it eats food
+- Game over when the snake collides with itself or the grid boundaries
+- Display the current score (length of the snake)
+- Restart the game after game over
+
+3. Core Classes, Functions, and Methods:
+- `Snake`: A class representing the snake, containing its position, direction, and size.
+  - `move()`: Updates the snake's position based on its current direction.
+  - `grow()`: Increases the size of the snake.
+  - `collides_with_itself()`: Checks if the snake has collided with itself.
+  - `collides_with_boundary(width, height)`: Checks if the snake has collided with the grid boundaries.
+
+- `Food`: A class representing the food, containing its position on the grid.
+  - `generate_new_position(width, height)`: Generates a new random position for the food on the grid.
+
+- `GameModel`: A class representing the game model, containing the snake, food, and game state.
+  - `update()`: Updates the game state, including the snake's movement and collision checks.
+  - `restart()`: Resets the game state to its initial state.
+
+- `GameView`: A class representing the game view, responsible for displaying the game state.
+  - `draw(snake, food, score)`: Draws the current game state, including the snake, food, and score.
+
+- `GameController`: A class representing the game controller, responsible for handling user input and updating the model and view.
+  - `handle_key_press(key)`: Handles key press events and updates the snake's direction accordingly.
+  - `run()`: The main game loop, updating the model and view based on user input.
+
+4. Non-standard Dependencies:
+- `pygame`: A library for creating video games in Python. It will be used for handling keyboard input, drawing the game state, and managing the game loop.
+
+With this specification, we can now proceed to implement the Snake game in Python using the MVC architecture and keyboard control.

@@ -1,0 +1,158 @@
+Let's start with the entrypoint file, which will import and run the GameController.
+
+```main.py
+from game_controller import GameController
+
+if __name__ == "__main__":
+    game_controller = GameController()
+    game_controller.run()
+```
+
+Now let's implement the Snake class.
+
+```snake.py
+from dataclasses import dataclass
+from typing import List, Tuple
+
+@dataclass
+class Snake:
+    position: List[Tuple[int, int]]
+    direction: Tuple[int, int]
+    size: int
+
+    def move(self):
+        head_x, head_y = self.position[0]
+        dir_x, dir_y = self.direction
+        new_head = (head_x + dir_x, head_y + dir_y)
+        self.position.insert(0, new_head)
+        self.position.pop()
+
+    def grow(self):
+        self.size += 1
+        self.position.append(self.position[-1])
+
+    def collides_with_itself(self) -> bool:
+        return self.position[0] in self.position[1:]
+
+    def collides_with_boundary(self, width: int, height: int) -> bool:
+        head_x, head_y = self.position[0]
+        return head_x < 0 or head_x >= width or head_y < 0 or head_y >= height
+```
+
+Next, let's implement the Food class.
+
+```food.py
+import random
+from dataclasses import dataclass
+
+@dataclass
+class Food:
+    position: Tuple[int, int]
+
+    def generate_new_position(self, width: int, height: int):
+        self.position = (random.randint(0, width - 1), random.randint(0, height - 1))
+```
+
+Now, let's implement the GameModel class.
+
+```game_model.py
+from snake import Snake
+from food import Food
+
+class GameModel:
+    def __init__(self, width: int, height: int):
+        self.width = width
+        self.height = height
+        self.snake = Snake([(width // 2, height // 2)], (1, 0), 3)
+        self.food = Food((width // 2 + 3, height // 2))
+        self.game_over = False
+
+    def update(self):
+        if self.game_over:
+            return
+
+        self.snake.move()
+
+        if self.snake.collides_with_itself() or self.snake.collides_with_boundary(self.width, self.height):
+            self.game_over = True
+            return
+
+        if self.snake.position[0] == self.food.position:
+            self.snake.grow()
+            self.food.generate_new_position(self.width, self.height)
+
+    def restart(self):
+        self.snake = Snake([(self.width // 2, self.height // 2)], (1, 0), 3)
+        self.food = Food((self.width // 2 + 3, self.height // 2))
+        self.game_over = False
+```
+
+Next, let's implement the GameView class.
+
+```game_view.py
+import pygame
+
+class GameView:
+    def __init__(self, width: int, height: int, cell_size: int):
+        self.width = width
+        self.height = height
+        self.cell_size = cell_size
+        pygame.init()
+        self.screen = pygame.display.set_mode((width * cell_size, height * cell_size))
+        pygame.display.set_caption("Snake")
+
+    def draw(self, snake, food, score):
+        self.screen.fill((0, 0, 0))
+
+        for segment in snake.position:
+            pygame.draw.rect(self.screen, (255, 255, 255), (*segment, self.cell_size, self.cell_size))
+
+        pygame.draw.rect(self.screen, (255, 0, 0), (*food.position, self.cell_size, self.cell_size))
+
+        font = pygame.font.Font(None, 36)
+        text = font.render(f"Score: {score}", True, (255, 255, 255))
+        self.screen.blit(text, (10, 10))
+
+        pygame.display.flip()
+```
+
+Finally, let's implement the GameController class.
+
+```game_controller.py
+import pygame
+from game_model import GameModel
+from game_view import GameView
+
+class GameController:
+    def __init__(self):
+        self.model = GameModel(20, 20)
+        self.view = GameView(20, 20, 20)
+        self.clock = pygame.time.Clock()
+
+    def handle_key_press(self, key):
+        if key == pygame.K_UP:
+            self.model.snake.direction = (0, -1)
+        elif key == pygame.K_DOWN:
+            self.model.snake.direction = (0, 1)
+        elif key == pygame.K_LEFT:
+            self.model.snake.direction = (-1, 0)
+        elif key == pygame.K_RIGHT:
+            self.model.snake.direction = (1, 0)
+
+    def run(self):
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    return
+                elif event.type == pygame.KEYDOWN:
+                    self.handle_key_press(event.key)
+                    if event.key == pygame.K_r and self.model.game_over:
+                        self.model.restart()
+
+            self.model.update()
+            self.view.draw(self.model.snake, self.model.food, self.model.snake.size)
+            self.clock.tick(10)
+```
+
+Now we have implemented all the necessary classes and their methods according to the specification. The code should be fully functional.
